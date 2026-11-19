@@ -31,14 +31,14 @@ export default function StatsPage() {
   if (loading || !s) return <Spinner />
   return (
     <div className="space-y-4">
-      <PageHeader title="Thống kê"><button className="btn-primary" onClick={() => setForm({ initial: {} })}><Plus size={16} />Chi phí</button></PageHeader>
+      <PageHeader title="Thống kê"><button className="btn-primary" onClick={() => setForm({ initial: {} })}><Plus size={16} />Chi phí vốn</button></PageHeader>
       <div className="grid grid-cols-2 gap-2 sm:max-w-md">
         <label className="space-y-1"><span className="text-xs font-medium text-slate-500">Từ ngày</span><input type="date" className="input" value={custom.from} max={custom.to || undefined} onChange={(e) => setCustom({ ...custom, from: e.target.value })} /></label>
         <label className="space-y-1"><span className="text-xs font-medium text-slate-500">Tới ngày</span><input type="date" className="input" value={custom.to} min={custom.from || undefined} onChange={(e) => setCustom({ ...custom, to: e.target.value })} /></label>
       </div>
 
       <h2 className="font-semibold">Sản phẩm</h2>
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-5"><Stat label="Tổng sản phẩm" value={s.products.total} /><Stat label="Đã bán" value={s.products.sold} /><Stat label="Chưa bán" value={s.products.unsold} /><Stat label="Số lượng tồn kho" value={s.products.stockQty} /><Stat label="Giá trị tồn (giá nhập)" value={money(s.products.stockValue)} /></div>
+      <div className="grid grid-cols-3 gap-2"><Stat label="Tổng sản phẩm" value={s.products.total} /><Stat label="Đã bán" value={s.products.sold} /><Stat label="Chưa bán" value={s.products.unsold} /></div>
       <h2 className="font-semibold">Thu tiền</h2>
       <div className="grid grid-cols-2 gap-2"><Stat label="Đã thu" value={money(s.collection.collected)} /><Stat label="Còn phải thu" value={money(s.collection.receivable)} tone="text-amber-600" /></div>
       <h2 className="font-semibold">Giá vốn & lợi nhuận</h2>
@@ -49,7 +49,7 @@ export default function StatsPage() {
         <Stat label="Lợi nhuận dự kiến" value={money(s.summary.expectedProfit)} tone={s.summary.expectedProfit >= 0 ? 'text-green-600' : 'text-red-600'} />
         <Stat label="Lợi nhuận thực tế" value={money(s.summary.actualProfit)} tone={s.summary.actualProfit >= 0 ? 'text-green-600' : 'text-red-600'} />
       </div>
-      <p className="text-xs text-slate-500">Chi phí vốn = giá nhập sản phẩm (tạo trong khoảng ngày) + các khoản chi phí đã phát sinh (marketing, vận chuyển, đóng gói…). Giá bán ra dự kiến = giá bán của hàng đó; thực tế = đơn đã giao. Lợi nhuận = giá bán ra − chi phí vốn. Khoản chi loại "Giá nhập" không cộng thêm vì đã nằm trong giá nhập sản phẩm.</p>
+      <p className="text-xs text-slate-500">Chi phí vốn = giá nhập sản phẩm (tạo trong khoảng ngày) + mọi khoản chi phí bạn thêm (tag nào cũng tính). Giá bán ra dự kiến = giá bán của số hàng đó; thực tế = các đơn đã giao. Lợi nhuận = giá bán ra − chi phí vốn. Nếu đã nhập giá nhập ở sản phẩm thì đừng nhập lại khoản đó ở chi phí vốn để tránh tính trùng.</p>
 
       <div className="grid gap-3 md:grid-cols-2">
         <Chart title="Doanh thu theo thời gian"><LineChart data={s.charts.series}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" fontSize={11} /><YAxis fontSize={11} tickFormatter={compact} /><Tooltip formatter={money} /><Line dataKey="revenue" name="Doanh thu" stroke={COLORS[1]} /></LineChart></Chart>
@@ -58,13 +58,13 @@ export default function StatsPage() {
         <Chart title="Đã bán và tồn kho"><BarChart data={s.charts.stock}><XAxis dataKey="name" fontSize={11} /><YAxis allowDecimals={false} fontSize={11} /><Tooltip /><Bar dataKey="value" name="Số lượng">{s.charts.stock.map((_, i) => <Cell key={i} fill={COLORS[i + 1]} />)}</Bar></BarChart></Chart>
       </div>
 
-      <h2 className="font-semibold">Khoản chi phí trong kỳ</h2>
+      <h2 className="font-semibold">Chi phí vốn trong kỳ</h2>
       <div className="card divide-y">{!s.expensesInRange.length ? <div className="p-4 text-sm text-slate-400">Chưa có khoản chi phí</div> : s.expensesInRange.map((e) => (
         <div key={e.id} className="flex items-center justify-between gap-2 p-3 text-sm">
-          <div><div className="font-medium">{e.name} <Badge tone={e.kind === 'planned' ? 'amber' : 'slate'}>{e.expense_categories?.name || 'Khác'}{e.kind === 'planned' && ' · dự kiến'}</Badge></div><div className="text-xs text-slate-500">{dateVN(e.incurred_on)}{e.note && ` · ${e.note}`}</div></div>
+          <div><div className="font-medium">{e.name} <Badge tone="slate">{e.expense_categories?.name || 'Khác'}</Badge></div><div className="text-xs text-slate-500">{dateVN(e.incurred_on)}{e.note && ` · ${e.note}`}</div></div>
           <div className="flex items-center gap-2"><b>{money(e.amount)}</b><button className="text-blue-600" onClick={() => setForm({ id: e.id, initial: e })}>Sửa</button><button className="text-red-600" onClick={() => confirmDelete() && run(() => expenseService.remove(e.id), 'Đã xóa').then(reload)}>Xóa</button></div>
         </div>))}</div>
-      {form && <Modal title={form.id ? 'Sửa chi phí' : 'Thêm chi phí'} onClose={() => setForm(null)}><ExpenseForm initial={form.initial} categories={data.categories} submitting={saving} onSubmit={save} onAddCategory={addCat} /></Modal>}
+      {form && <Modal title={form.id ? 'Sửa chi phí vốn' : 'Thêm chi phí vốn'} onClose={() => setForm(null)}><ExpenseForm initial={form.initial} categories={data.categories} submitting={saving} onSubmit={save} onAddCategory={addCat} /></Modal>}
     </div>
   )
 }
