@@ -7,11 +7,10 @@ import { orderService } from '../services/orderService'
 import { expenseService } from '../services/expenseService'
 import { computeStats } from '../services/statsService'
 import { run } from '../lib/errors'
-import { Spinner, Stat, Modal, Select, PageHeader, Badge } from '../components/ui'
+import { Spinner, Stat, Modal, PageHeader, Badge } from '../components/ui'
 import ExpenseForm from '../features/stats/ExpenseForm'
 import { getRange, toISODate } from '../utils/dates'
 import { money, dateVN, confirmDelete } from '../utils/format'
-import { RANGE_OPTIONS, GROUP_OPTIONS } from '../utils/constants'
 
 const COLORS = ['#0f172a', '#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#9333ea']
 const Chart = ({ title, children }) => <div className="card p-3"><div className="mb-2 text-sm font-medium">{title}</div><div className="h-56"><ResponsiveContainer>{children}</ResponsiveContainer></div></div>
@@ -22,30 +21,35 @@ export default function StatsPage() {
     const [products, orders, expenses, categories] = await Promise.all([productService.list(), orderService.list(), expenseService.list(), expenseService.categories()])
     return { products, orders, expenses, categories }
   })
-  const [rangeKey, setRangeKey] = useState('month'), [group, setGroup] = useState('day')
-  const [custom, setCustom] = useState({ from: toISODate(new Date()), to: toISODate(new Date()) })
+  const now = new Date()
+  const [custom, setCustom] = useState({ from: toISODate(new Date(now.getFullYear(), now.getMonth(), 1)), to: toISODate(now) })
   const [form, setForm] = useState(null), [saving, setSaving] = useState(false)
-  const range = useMemo(() => getRange(rangeKey, { from: custom.from && new Date(custom.from + 'T00:00:00'), to: custom.to && new Date(custom.to + 'T00:00:00') }), [rangeKey, custom])
-  const s = useMemo(() => data && computeStats({ ...data, range, group }), [data, range, group])
+  const range = useMemo(() => getRange('custom', { from: custom.from && new Date(custom.from + 'T00:00:00'), to: custom.to && new Date(custom.to + 'T00:00:00') }), [custom])
+  const s = useMemo(() => data && computeStats({ ...data, range }), [data, range])
   const save = async (f) => { setSaving(true); const ok = await run(() => expenseService.save(form.id, f), 'Đã lưu chi phí'); setSaving(false); if (ok) { setForm(null); reload() } }
   const addCat = async (name) => { let c; await run(async () => { [c] = await expenseService.addCategory(name) }, 'Đã thêm loại chi phí'); if (c) await reload(); return c }
   if (loading || !s) return <Spinner />
   return (
     <div className="space-y-4">
       <PageHeader title="Thống kê"><button className="btn-primary" onClick={() => setForm({ initial: {} })}><Plus size={16} />Chi phí</button></PageHeader>
-      <div className="flex flex-wrap items-center gap-2">
-        {Object.entries(RANGE_OPTIONS).map(([k, l]) => <button key={k} className={`!py-1 ${rangeKey === k ? 'btn-primary' : 'btn-outline'}`} onClick={() => setRangeKey(k)}>{l}</button>)}
-        <div className="w-28"><Select options={GROUP_OPTIONS} value={group} onChange={(e) => setGroup(e.target.value)} /></div>
+      <div className="grid grid-cols-2 gap-2 sm:max-w-md">
+        <label className="space-y-1"><span className="text-xs font-medium text-slate-500">Từ ngày</span><input type="date" className="input" value={custom.from} max={custom.to || undefined} onChange={(e) => setCustom({ ...custom, from: e.target.value })} /></label>
+        <label className="space-y-1"><span className="text-xs font-medium text-slate-500">Tới ngày</span><input type="date" className="input" value={custom.to} min={custom.from || undefined} onChange={(e) => setCustom({ ...custom, to: e.target.value })} /></label>
       </div>
-      {rangeKey === 'custom' && <div className="flex gap-2"><input type="date" className="input" value={custom.from} onChange={(e) => setCustom({ ...custom, from: e.target.value })} /><input type="date" className="input" value={custom.to} onChange={(e) => setCustom({ ...custom, to: e.target.value })} /></div>}
 
       <h2 className="font-semibold">Sản phẩm</h2>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-5"><Stat label="Tổng sản phẩm" value={s.products.total} /><Stat label="Đã bán" value={s.products.sold} /><Stat label="Chưa bán" value={s.products.unsold} /><Stat label="Số lượng tồn kho" value={s.products.stockQty} /><Stat label="Giá trị tồn (giá nhập)" value={money(s.products.stockValue)} /></div>
       <h2 className="font-semibold">Doanh thu</h2>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-4"><Stat label="Giá trị bán dự kiến" value={money(s.revenue.expectedSales)} /><Stat label="Doanh thu (đã giao)" value={money(s.revenue.actual)} tone="text-green-600" /><Stat label="Đã thu" value={money(s.revenue.collected)} /><Stat label="Còn phải thu" value={money(s.revenue.receivable)} tone="text-amber-600" /></div>
       <h2 className="font-semibold">Chi phí & lợi nhuận</h2>
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-4"><Stat label="Tổng giá nhập hàng" value={money(s.cost.purchase)} /><Stat label="Chi phí marketing" value={money(s.cost.marketing)} /><Stat label="Chi phí khác" value={money(s.cost.other)} /><Stat label="Tổng chi phí" value={money(s.cost.total)} /><Stat label="Giá vốn hàng đã bán" value={money(s.cost.cogs)} /><Stat label="Lợi nhuận dự kiến" value={money(s.profit.expected)} /><Stat label="Lợi nhuận thực tế" value={money(s.profit.actual)} tone={s.profit.actual >= 0 ? 'text-green-600' : 'text-red-600'} /></div>
-      <p className="text-xs text-slate-500">Lợi nhuận thực tế = Doanh thu đã giao − Giá vốn hàng đã bán − Chi phí vận hành đã phát sinh (không gồm tiền nhập hàng, tránh tính trùng với giá vốn).</p>
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+        <Stat label="Chi phí vốn (giá vốn hàng đã bán)" value={money(s.cost.capital)} />
+        <Stat label="Tổng chi phí bán ra dự kiến" value={money(s.cost.expectedSelling)} />
+        <Stat label="Tổng chi phí bán ra thực tế" value={money(s.cost.actualSelling)} />
+        <Stat label="Lợi nhuận dự kiến" value={money(s.profit.expected)} />
+        <Stat label="Lợi nhuận thực tế" value={money(s.profit.actual)} tone={s.profit.actual >= 0 ? 'text-green-600' : 'text-red-600'} />
+      </div>
+      <p className="text-xs text-slate-500">Lợi nhuận thực tế = Doanh thu đã giao − Chi phí vốn − Chi phí bán ra thực tế. Lợi nhuận dự kiến = Giá bán hàng chưa bán − Giá vốn hàng chưa bán − Chi phí bán ra dự kiến. Khoản chi thuộc loại "Giá nhập" không tính vào chi phí bán ra (đã nằm trong chi phí vốn).</p>
 
       <div className="grid gap-3 md:grid-cols-2">
         <Chart title="Doanh thu theo thời gian"><LineChart data={s.charts.series}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" fontSize={11} /><YAxis fontSize={11} tickFormatter={compact} /><Tooltip formatter={money} /><Line dataKey="revenue" name="Doanh thu" stroke={COLORS[1]} /></LineChart></Chart>
