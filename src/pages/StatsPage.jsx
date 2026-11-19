@@ -39,17 +39,17 @@ export default function StatsPage() {
 
       <h2 className="font-semibold">Sản phẩm</h2>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-5"><Stat label="Tổng sản phẩm" value={s.products.total} /><Stat label="Đã bán" value={s.products.sold} /><Stat label="Chưa bán" value={s.products.unsold} /><Stat label="Số lượng tồn kho" value={s.products.stockQty} /><Stat label="Giá trị tồn (giá nhập)" value={money(s.products.stockValue)} /></div>
-      <h2 className="font-semibold">Doanh thu</h2>
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-4"><Stat label="Giá trị bán dự kiến" value={money(s.revenue.expectedSales)} /><Stat label="Doanh thu (đã giao)" value={money(s.revenue.actual)} tone="text-green-600" /><Stat label="Đã thu" value={money(s.revenue.collected)} /><Stat label="Còn phải thu" value={money(s.revenue.receivable)} tone="text-amber-600" /></div>
-      <h2 className="font-semibold">Chi phí & lợi nhuận</h2>
+      <h2 className="font-semibold">Thu tiền</h2>
+      <div className="grid grid-cols-2 gap-2"><Stat label="Đã thu" value={money(s.collection.collected)} /><Stat label="Còn phải thu" value={money(s.collection.receivable)} tone="text-amber-600" /></div>
+      <h2 className="font-semibold">Giá vốn & lợi nhuận</h2>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
-        <Stat label="Chi phí vốn (giá vốn hàng đã bán)" value={money(s.cost.capital)} />
-        <Stat label="Tổng chi phí bán ra dự kiến" value={money(s.cost.expectedSelling)} />
-        <Stat label="Tổng chi phí bán ra thực tế" value={money(s.cost.actualSelling)} />
-        <Stat label="Lợi nhuận dự kiến" value={money(s.profit.expected)} />
-        <Stat label="Lợi nhuận thực tế" value={money(s.profit.actual)} tone={s.profit.actual >= 0 ? 'text-green-600' : 'text-red-600'} />
+        <Stat label="Chi phí vốn" value={money(s.summary.capital)} />
+        <Stat label="Tổng giá bán ra dự kiến" value={money(s.summary.expectedSales)} />
+        <Stat label="Tổng giá bán ra thực tế" value={money(s.summary.actualSales)} tone="text-green-600" />
+        <Stat label="Lợi nhuận dự kiến" value={money(s.summary.expectedProfit)} tone={s.summary.expectedProfit >= 0 ? 'text-green-600' : 'text-red-600'} />
+        <Stat label="Lợi nhuận thực tế" value={money(s.summary.actualProfit)} tone={s.summary.actualProfit >= 0 ? 'text-green-600' : 'text-red-600'} />
       </div>
-      <p className="text-xs text-slate-500">Lợi nhuận thực tế = Doanh thu đã giao − Chi phí vốn − Chi phí bán ra thực tế. Lợi nhuận dự kiến = Giá bán hàng chưa bán − Giá vốn hàng chưa bán − Chi phí bán ra dự kiến. Khoản chi thuộc loại "Giá nhập" không tính vào chi phí bán ra (đã nằm trong chi phí vốn).</p>
+      <p className="text-xs text-slate-500">Chi phí vốn = giá nhập sản phẩm (tạo trong khoảng ngày) + các khoản chi phí đã phát sinh (marketing, vận chuyển, đóng gói…). Giá bán ra dự kiến = giá bán của hàng đó; thực tế = đơn đã giao. Lợi nhuận = giá bán ra − chi phí vốn. Khoản chi loại "Giá nhập" không cộng thêm vì đã nằm trong giá nhập sản phẩm.</p>
 
       <div className="grid gap-3 md:grid-cols-2">
         <Chart title="Doanh thu theo thời gian"><LineChart data={s.charts.series}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" fontSize={11} /><YAxis fontSize={11} tickFormatter={compact} /><Tooltip formatter={money} /><Line dataKey="revenue" name="Doanh thu" stroke={COLORS[1]} /></LineChart></Chart>
