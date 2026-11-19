@@ -1,0 +1,13 @@
+export const PRODUCT_STATUS = { available: 'Chưa bán', sold: 'Đã bán' }
+export const ORDER_STATUS = { pending: 'Chờ xác nhận', confirmed: 'Đã xác nhận', shipping: 'Đang giao', delivered: 'Đã giao', cancelled: 'Đã hủy', returned: 'Hoàn hàng' }
+export const ACTIVE_ORDER_STATUSES = ['pending', 'confirmed', 'shipping', 'delivered']
+export const PAYMENT_METHOD = { cod: 'COD', transfer: 'Chuyển khoản', cash: 'Tiền mặt' }
+export const PAYMENT_STATUS = { unpaid: 'Chưa thanh toán', partial: 'Thanh toán một phần', paid: 'Đã thanh toán' }
+export const SCHEDULE_STATUS = { planned: 'Dự kiến', posted: 'Đã đăng', cancelled: 'Đã hủy' }
+export const EXPENSE_KIND = { incurred: 'Đã phát sinh', planned: 'Dự kiến' }
+export const PURCHASE_CATEGORY = 'Giá nhập'
+export const MARKETING_CATEGORY = 'Marketing'
+export const DEFAULT_EXPENSE_CATEGORIES = [PURCHASE_CATEGORY, MARKETING_CATEGORY, 'Vận chuyển', 'Đóng gói', 'Khác']
+export const SORT_OPTIONS = { newest: 'Mới nhất', oldest: 'Cũ nhất', priceAsc: 'Giá tăng dần', priceDesc: 'Giá giảm dần', name: 'Tên A-Z' }
+export const RANGE_OPTIONS = { today: 'Hôm nay', '7d': '7 ngày', month: 'Tháng này', lastMonth: 'Tháng trước', year: 'Năm nay', custom: 'Tùy chọn' }
+export const GROUP_OPTIONS = { day: 'Ngày', week: 'Tuần', month: 'Tháng', year: 'Năm' }
