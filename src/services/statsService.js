@@ -20,8 +20,7 @@ export function computeStats({ products, orders, expenses, range }) {
   const productCost = sum(batch, (p) => (p.cost_price || 0) * origQty(p))
   const expectedSales = sum(batch, (p) => (p.sale_price || 0) * origQty(p))
 
-  const incurred = expenses.filter((e) => e.kind === 'incurred' && inRange(e.incurred_on, range))
-  const otherCosts = incurred.filter((e) => catName(e) !== PURCHASE_CATEGORY) // loại "Giá nhập" đã nằm trong giá nhập sản phẩm
+  const otherCosts = expenses.filter((e) => inRange(e.incurred_on, range)) // mọi khoản chi phí, tag nào cũng là chi phí vốn
   const capital = productCost + sum(otherCosts, (e) => e.amount)
 
   const delivered = orders.filter((o) => o.status === 'delivered' && inRange(o.delivered_at || o.created_at, range))
@@ -37,7 +36,7 @@ export function computeStats({ products, orders, expenses, range }) {
   const soldCount = products.filter((p) => p.status === 'sold').length
   const stockQty = sum(available, (p) => p.quantity)
   return {
-    products: { total: products.length, sold: soldCount, unsold: available.length, stockQty, stockValue: sum(available, (p) => (p.cost_price || 0) * p.quantity) },
+    products: { total: products.length, sold: soldCount, unsold: available.length, stockQty },
     collection: { collected: sum(active, (o) => o.amount_paid), receivable: sum(active, (o) => Math.max(orderTotal(o) - o.amount_paid, 0)) },
     summary: { capital, expectedSales, actualSales: revenue, expectedProfit: expectedSales - capital, actualProfit: revenue - capital },
     charts: { series: Object.values(byDay).sort((a, b) => a.name.localeCompare(b.name)), costByCat, stock: [{ name: 'Đã bán', value: soldCount }, { name: 'Tồn kho', value: stockQty }] },
