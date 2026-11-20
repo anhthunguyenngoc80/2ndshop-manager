@@ -35,3 +35,10 @@ npm run dev
 ## 6. Ghi chú
 - UI viết bằng Tailwind theo phong cách shadcn/ui (Button, Modal, Badge… ở `src/components/ui.jsx`). Có thể chạy `npx shadcn@latest init` để thay thế bằng bản chính thức.
 - Hộp thoại xác nhận xóa dùng `confirmDelete` (`src/utils/format.js`), dễ thay bằng AlertDialog.
+
+## 7. Trang khách (cửa hàng online)
+- Khách vào `/shop` (không cần đăng nhập). Admin đăng nhập tại `/login`.
+- Chạy thêm `supabase/storefront.sql` **một lần** trong SQL Editor (sau `schema.sql`).
+- Trong app: biểu tượng cửa hàng ở header → nhập tên shop, Threads/Instagram/SĐT, chọn thông tin khách được xem, rồi **Lưu** (bắt buộc lưu 1 lần để trang khách hoạt động).
+- Tick "Đăng bán cho khách xem" ở từng sản phẩm. Khách để lại thông tin sẽ hiện ở tab "Khách liên hệ".
+- **Bảo mật:** tắt đăng ký tài khoản mới (Supabase → Authentication → Sign In / Providers → tắt *Allow new users to sign up*) và tạo tài khoản admin trong Authentication → Users.

@@ -47,7 +47,7 @@ export default function ProductsPage() {
           <div key={p.id} onClick={() => nav(`/products/${p.id}`)} className="card cursor-pointer overflow-hidden">
             <div className="aspect-square bg-slate-100">{coverOf(p) && <img src={coverOf(p)} className="h-full w-full object-cover" loading="lazy" />}</div>
             <div className="space-y-1 p-2">
-              <div className="truncate text-sm font-medium">{p.name || 'Chưa đặt tên'}</div>
+              <div className="truncate text-sm font-medium">{p.is_published && <span title="Đang đăng bán cho khách">🌐 </span>}{p.name || 'Chưa đặt tên'}</div>
               <div className="flex items-center justify-between"><span className="text-sm font-semibold">{money(p.sale_price)}</span><StatusBadge p={p} /></div>
               <div className="flex gap-1"><button className="btn-outline flex-1 !py-1 text-xs" onClick={(e) => toggle(e, p)}>{p.status === 'sold' ? 'Đánh dấu chưa bán' : 'Đánh dấu đã bán'}</button><button className="btn-outline !py-1 text-xs text-red-600" onClick={(e) => del(e, p)}>Xóa</button></div>
             </div>

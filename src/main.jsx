@@ -4,7 +4,8 @@ import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'sonner'
 import App from './routes'
 import { AuthProvider } from './hooks/useAuth'
+import { CartProvider } from './hooks/useCart'
 import './index.css'
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter><AuthProvider><App /><Toaster position="top-center" richColors /></AuthProvider></BrowserRouter>
+  <BrowserRouter><AuthProvider><CartProvider><App /><Toaster position="top-center" richColors /></CartProvider></AuthProvider></BrowserRouter>
 )

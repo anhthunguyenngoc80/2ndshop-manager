@@ -3,7 +3,7 @@ import { Camera, Image as ImageIcon, X } from 'lucide-react'
 import { Field, Select } from '../../components/ui'
 import { PRODUCT_STATUS } from '../../utils/constants'
 
-const EMPTY = { name: '', sale_price: '', category: '', cost_price: '', material: '', color: '', size: '', quantity: 1, status: 'available', supplier: '', note: '', styling_ideas: '' }
+const EMPTY = { name: '', sale_price: '', category: '', cost_price: '', material: '', color: '', size: '', quantity: 1, status: 'available', is_published: false, supplier: '', note: '', styling_ideas: '' }
 export default function ProductForm({ initial, withFiles, submitting, onSubmit }) {
   const [f, setF] = useState({ ...EMPTY, ...(initial || {}) })
   const [files, setFiles] = useState([])
@@ -42,6 +42,7 @@ export default function ProductForm({ initial, withFiles, submitting, onSubmit }
         <Field label="Ghi chú"><textarea className="input" rows={2} value={f.note ?? ''} onChange={set('note')} /></Field>
         <Field label="Ý tưởng phối đồ / nội dung"><textarea className="input" rows={2} value={f.styling_ideas ?? ''} onChange={set('styling_ideas')} /></Field>
       </div>}
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!f.is_published} onChange={(e) => setF((s) => ({ ...s, is_published: e.target.checked }))} />Đăng bán cho khách xem</label>
       <button className="btn-primary w-full" disabled={submitting || (withFiles && !files.length && !f.sale_price && !f.name)}>{submitting ? 'Đang lưu…' : 'Lưu'}</button>
     </form>
   )

@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { Package, CalendarDays, ShoppingBag, BarChart3, Plus, LogOut, Tag } from 'lucide-react'
+import { Package, CalendarDays, ShoppingBag, BarChart3, Plus, LogOut, Tag, Store } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 const tabs = [
   { to: '/', label: 'Sản phẩm', icon: Package },
@@ -16,7 +16,7 @@ export default function Layout() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">
           <span className="font-bold">🛍️ Shop</span>
           <nav className="hidden gap-4 md:flex">{tabs.map((t) => <NavLink key={t.to} to={t.to} end className={link}><t.icon size={16} />{t.label}</NavLink>)}</nav>
-          <div className="flex gap-3"><button onClick={() => nav('/names')} aria-label="Lưu tên"><Tag size={18} /></button><button onClick={() => supabase.auth.signOut()} aria-label="Đăng xuất"><LogOut size={18} /></button></div>
+          <div className="flex gap-3"><button onClick={() => nav('/storefront')} aria-label="Cửa hàng online"><Store size={18} /></button><button onClick={() => nav('/names')} aria-label="Lưu tên"><Tag size={18} /></button><button onClick={() => supabase.auth.signOut()} aria-label="Đăng xuất"><LogOut size={18} /></button></div>
         </div>
       </header>
       <main className="mx-auto max-w-6xl p-4"><Outlet /></main>
