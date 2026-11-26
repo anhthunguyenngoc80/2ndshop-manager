@@ -11,6 +11,6 @@ export const DEFAULT_EXPENSE_CATEGORIES = [PURCHASE_CATEGORY, MARKETING_CATEGORY
 export const SORT_OPTIONS = { newest: 'Mới nhất', oldest: 'Cũ nhất', priceAsc: 'Giá tăng dần', priceDesc: 'Giá giảm dần', name: 'Tên A-Z' }
 export const RANGE_OPTIONS = { today: 'Hôm nay', '7d': '7 ngày', month: 'Tháng này', lastMonth: 'Tháng trước', year: 'Năm nay', custom: 'Tùy chọn' }
 export const GROUP_OPTIONS = { day: 'Ngày', week: 'Tuần', month: 'Tháng', year: 'Năm' }
-export const VISIBLE_FIELD_LABELS = { sale_price: 'Giá bán', category: 'Danh mục', material: 'Chất liệu', color: 'Màu sắc', size: 'Kích thước', quantity: 'Số lượng', note: 'Ghi chú', styling_ideas: 'Ý tưởng phối đồ', created_at: 'Ngày đăng' }
+export const VISIBLE_FIELD_LABELS = { sale_price: 'Giá bán', category: 'Danh mục', material: 'Chất liệu', color: 'Màu sắc', size: 'Kích thước', quantity: 'Số lượng', note: 'Ghi chú', styling_ideas: 'Ý tưởng phối đồ', created_at: 'Ngày đăng', measurements: 'Số đo (dài, rộng, V1…)' }
 export const CONTACT_TYPES = { threads: 'Threads', instagram: 'Instagram', phone: 'Số điện thoại' }
 export const INQUIRY_STATUS = { new: 'Mới', done: 'Đã liên hệ' }

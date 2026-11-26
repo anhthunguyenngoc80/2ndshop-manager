@@ -4,6 +4,7 @@ import { emptyToNull, sortedMedia } from '../utils/format'
 export function cleanProduct(form) {
   const o = emptyToNull(form)
   ;['cost_price', 'sale_price'].forEach((k) => { if (o[k] != null) o[k] = Number(o[k]) })
+  o.measurements = (o.measurements || []).filter((m) => (m.label || '').trim()).map((m) => ({ label: m.label.trim(), value: String(m.value ?? '').trim() }))
   if (o.quantity == null) delete o.quantity; else o.quantity = Number(o.quantity)
   return o
 }

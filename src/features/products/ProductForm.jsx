@@ -3,7 +3,7 @@ import { Camera, Image as ImageIcon, X } from 'lucide-react'
 import { Field, Select } from '../../components/ui'
 import { PRODUCT_STATUS } from '../../utils/constants'
 
-const EMPTY = { name: '', sale_price: '', category: '', cost_price: '', material: '', color: '', size: '', quantity: 1, status: 'available', is_published: false, supplier: '', note: '', styling_ideas: '' }
+const EMPTY = { name: '', sale_price: '', category: '', cost_price: '', material: '', color: '', size: '', quantity: 1, status: 'available', is_published: false, measurements: [], supplier: '', note: '', styling_ideas: '' }
 export default function ProductForm({ initial, withFiles, submitting, onSubmit }) {
   const [f, setF] = useState({ ...EMPTY, ...(initial || {}) })
   const [files, setFiles] = useState([])
@@ -11,6 +11,9 @@ export default function ProductForm({ initial, withFiles, submitting, onSubmit }
   const previews = useMemo(() => files.map((x) => ({ x, url: URL.createObjectURL(x) })), [files])
   const set = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }))
   const text = (k, label, type = 'text') => <Field label={label}><input className="input" type={type} value={f[k] ?? ''} onChange={set(k)} /></Field>
+  const addM = (label) => setF((s) => ({ ...s, measurements: [...(s.measurements || []), { label, value: '' }] }))
+  const setM = (i, k) => (e) => setF((s) => ({ ...s, measurements: s.measurements.map((m, j) => (j === i ? { ...m, [k]: e.target.value } : m)) }))
+  const delM = (i) => setF((s) => ({ ...s, measurements: s.measurements.filter((_, j) => j !== i) }))
   const addFiles = (e) => { setFiles((s) => [...s, ...e.target.files]); e.target.value = '' }
   const submit = (e) => {
     e.preventDefault()
@@ -37,6 +40,18 @@ export default function ProductForm({ initial, withFiles, submitting, onSubmit }
       {more && <div className="space-y-3">
         {text('name', 'Tên sản phẩm')}
         <div className="grid grid-cols-2 gap-2">{text('category', 'Danh mục')}{text('cost_price', 'Giá nhập (₫)', 'number')}{text('material', 'Chất liệu')}{text('color', 'Màu sắc')}{text('size', 'Kích thước')}{text('quantity', 'Số lượng', 'number')}</div>
+        <div className="space-y-2">
+          <div className="text-xs font-medium text-slate-500">Số đo (tự thêm: dài, rộng, V1, V2…)</div>
+          {(f.measurements || []).map((m, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input className="input" placeholder="Tên (vd: Dài)" value={m.label} onChange={setM(i, 'label')} />
+              <input className="input" placeholder="Giá trị (vd: 45 cm)" value={m.value} onChange={setM(i, 'value')} />
+              <button type="button" onClick={() => delM(i)} aria-label="Xóa số đo"><X size={16} /></button>
+            </div>))}
+          <div className="flex flex-wrap gap-1">
+            {['Dài', 'Rộng', 'Cao', 'V1', 'V2', 'V3', ''].map((l) => <button type="button" key={l || 'other'} className="rounded-full border px-2 py-0.5 text-xs" onClick={() => addM(l)}>+ {l || 'Khác'}</button>)}
+          </div>
+        </div>
         <Field label="Trạng thái"><Select options={PRODUCT_STATUS} value={f.status} onChange={set('status')} /></Field>
         {text('supplier', 'Nhà cung cấp')}
         <Field label="Ghi chú"><textarea className="input" rows={2} value={f.note ?? ''} onChange={set('note')} /></Field>
